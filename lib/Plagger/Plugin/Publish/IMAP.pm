@@ -8,6 +8,7 @@ use Encode qw/ from_to encode/;
 use Encode::MIME::Header;
 use MIME::Lite;
 use IO::File;
+use IO::Socket::SSL;
 use Mail::IMAPClient;
 use Digest::MD5 qw/ md5_hex /;
 
@@ -27,7 +28,18 @@ sub rule_hook { 'publish.entry' }
 sub initialize {
     my($self, $context, $args) = @_;
     my $cfg = $self->conf;
+
+    my $socket = undef;
+    if ($cfg->{use_ssl}) {
+            $socket = IO::Socket::SSL->new(
+            Proto    => 'tcp',
+            PeerAddr => $cfg->{host} || 'localhost',
+            PeerPort => $cfg->{port} || 993,
+          ) or die $context->log(error => "create scoket error; $@");
+    }
+
     $self->{imap} = Mail::IMAPClient->new(
+        Socket   => $socket,
         User     => $cfg->{username},
         Password => $cfg->{password},
         Server   => $cfg->{host} || 'localhost',
@@ -92,7 +104,7 @@ sub store_entry {
 sub store_maildir {
     my($self, $context, $msg) = @_;
     my $folder = $self->conf->{folder} || 'INBOX';
-    my $uid = $self->{imap}->append_string($folder, $msg)
+    my $uid = $self->{imap}->append_string($folder, $msg, $self->conf->{mark})
       or die $context->log(error => "Could not append: $@");
 }
 
@@ -106,10 +118,12 @@ Plagger::Plugin::Publish::IMAP - Transmits IMAP server
 
   - module: Publish::IMAP
     config:
+      use_ssl: 1
       username: user
       password: passwd
       folder: plagger
       mailfrom: plagger@localhost
+      mark: "\\Seen"
 
 =head1 DESCRIPTION
 
