@@ -55,7 +55,7 @@ sub discover {
 
 sub looks_like_feed {
     my($self, $content_ref) = @_;
-    $$content_ref =~ m!<rss |<rdf:RDF\s+.*?xmlns="http://purl\.org/rss|<feed\s+xmlns="!s;
+    $$content_ref =~ m!<rss |<rdf:RDF\s+.*?xmlns="http://purl\.org/rss|<feed\s+(xml:lang=".*"\s+)?xmlns=!s;
 }
 
 1;
