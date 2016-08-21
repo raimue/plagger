@@ -20,6 +20,8 @@ sub handle {
         $content = [ $content ] unless ref $content && ref $content eq 'ARRAY';
 
         for my $media_content (@{$content}) {
+            next unless ref $media_content eq 'HASH';
+
             my $enclosure = Plagger::Enclosure->new;
             $enclosure->url( URI->new($media_content->{url}) );
             $enclosure->auto_set_type($media_content->{type});
