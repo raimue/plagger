@@ -54,7 +54,7 @@ sub dumbnail {
     my($img, $p) = @_;
 
     if (!$img->{width} && !$img->{height}) {
-        return '';
+        return qq(style="width: auto; max-height: $p->{height};");
     }
 
     if ($img->{width} <= $p->{width} && $img->{height} <= $p->{height}) {
