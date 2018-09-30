@@ -180,10 +180,11 @@ sub deliver {
     my $home = $self->{home};
     my $bin = $self->{bin};
     my $folder = $self->conf->{folder};
+    my $separator = $self->conf->{separator};
 
     my $cmd = "HOME=\"$home\" \"$bin\"";
     if ($self->conf->{create_subfolders}) {
-        $cmd .= " -m \"$folder.$subfolder\"";
+        $cmd .= " -m \"$folder$separator$subfolder\"";
         $cmd .= " -o lda_mailbox_autocreate=yes";
     } else {
         $cmd .= " -m \"$folder\"";
@@ -215,6 +216,7 @@ Plagger::Plugin::Publish::DovecotLDA - Deliver with dovecot-lda
     config:
       home: /home/foo
       folder: plagger
+      separator: .
       dovecot_lda: /usr/lib/dovecot/dovecot-lda
       create_subfolders: 0
       attach_enclosures: 1
