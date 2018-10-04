@@ -180,6 +180,7 @@ sub deliver {
     my($self, $context, $msg, $subfolder, $id) = @_;
     my $home = $self->{home};
     my $bin = $self->{bin};
+    my $extra_args = $self->conf->{extra_args};
     my $folder = $self->conf->{folder};
     my $separator = $self->conf->{separator};
 
@@ -190,6 +191,7 @@ sub deliver {
     } else {
         $cmd .= " -m \"$folder\"";
     }
+    $cmd .= " $extra_args";
 
     $context->log(debug => "executing: $cmd");
     my $pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR, $cmd)
@@ -219,6 +221,7 @@ Plagger::Plugin::Publish::DovecotLDA - Deliver with dovecot-lda
       folder: plagger
       separator: .
       dovecot_lda: /usr/lib/dovecot/dovecot-lda
+      extra_args: -o maildir:~/mail.fs:LAYOUT=fs
       create_subfolders: 0
       attach_enclosures: 1
       mailfrom: plagger@localhost
