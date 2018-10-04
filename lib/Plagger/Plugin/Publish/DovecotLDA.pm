@@ -61,6 +61,7 @@ sub store_entry {
     my $entry      = $args->{entry};
     my $feed_title = $args->{feed}->title->plaintext;
     $feed_title =~ tr/,//d;
+    my $from_name = $feed_title;
     my $subject = $entry->title->plaintext || '(no-title)';
     my $body = $self->templatize('mail.tt', $args);
     $body = encode("utf-8", $body);
@@ -74,7 +75,7 @@ sub store_entry {
     }
     $msg = MIME::Lite->new(
         Date    => $date->format('Mail'),
-        From    => encode('MIME-Header', qq("$feed_title" <$from>)),
+        From    => encode('MIME-Header', $from_name) . " <$from>",
         To      => $cfg->{mailto},
         Subject => encode('MIME-Header', $subject),
         Type    => 'multipart/related',
