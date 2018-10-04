@@ -61,7 +61,7 @@ sub store_entry {
     my $entry      = $args->{entry};
     my $feed_title = $args->{feed}->title->plaintext;
     $feed_title =~ tr/,//d;
-    my $from_name = $feed_title;
+    my $from_name = $feed_title =~ s/.*\///r;
     my $subject = $entry->title->plaintext || '(no-title)';
     my $body = $self->templatize('mail.tt', $args);
     $body = encode("utf-8", $body);
