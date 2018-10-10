@@ -60,9 +60,9 @@ sub store_entry {
     my $msg;
     my $entry      = $args->{entry};
     my $feed_title = $args->{feed}->title->plaintext;
-    $feed_title =~ tr/,//d;
-    my $from_name = $feed_title =~ s/.*\///r;
+    my $from_name = $feed_title;
     my $subject = $entry->title->plaintext || '(no-title)';
+    my $mailbox = $args->{feed}->meta->{mailbox} || "";
     my $body = $self->templatize('mail.tt', $args);
     $body = encode("utf-8", $body);
     my $from = $cfg->{mailfrom} || 'plagger@localhost';
@@ -92,7 +92,7 @@ sub store_entry {
     $msg->add('X-Tags', encode('MIME-Header', join(' ', @{ $entry->tags })));
     my $xmailer = "Plagger/$Plagger::VERSION";
     $msg->replace('X-Mailer', $xmailer);
-    deliver($self, $context, $msg->as_string(), $feed_title, $id);
+    deliver($self, $context, $msg->as_string(), $mailbox, $id);
     $self->{msg} += 1;
 }
 
@@ -185,7 +185,7 @@ sub deliver {
     my $separator = $self->conf->{separator};
 
     my $cmd = "HOME=\"$home\" \"$bin\"";
-    if ($self->conf->{create_subfolders}) {
+    if ($self->conf->{create_subfolders} && $subfolder ne "") {
         $cmd .= " -m \"$folder$separator$subfolder\"";
         $cmd .= " -o lda_mailbox_autocreate=yes";
     } else {
@@ -214,6 +214,13 @@ sub deliver {
 Plagger::Plugin::Publish::DovecotLDA - Deliver with dovecot-lda
 
 =head1 SYNOPSIS
+
+  - module: Subscription::Config
+    config:
+      feed:
+        - url: https://m.xkcd.com/atom.xml
+          link: http://xkcd.com/
+          meta: { mailbox: "Comics.xkcd" }
 
   - module: Publish::DovecotLDA 
     config:
