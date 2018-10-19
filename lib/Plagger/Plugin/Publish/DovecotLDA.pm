@@ -75,9 +75,9 @@ sub store_entry {
     }
     $msg = MIME::Lite->new(
         Date    => $date->format('Mail'),
-        From    => encode('MIME-Header', $from_name) . " <$from>",
+        From    => encode('MIME-Header', "X: " . $from_name . " <$from>") =~ s/X: //r,
         To      => $cfg->{mailto},
-        Subject => encode('MIME-Header', $subject),
+        Subject => encode('MIME-Header', "X: " . $subject) =~ s/X: //r,
         Type    => 'multipart/related',
     );
     $msg->attach(
@@ -89,7 +89,7 @@ sub store_entry {
         $cb->($msg);
     }
     $msg->add('Message-Id', "<$id.plagger\@localhost>");
-    $msg->add('X-Tags', encode('MIME-Header', join(' ', @{ $entry->tags })));
+    $msg->add('X-Tags', encode('MIME-Header', "X: " . join(' ', @{ $entry->tags }) =~ s/X: //r));
     my $xmailer = "Plagger/$Plagger::VERSION";
     $msg->replace('X-Mailer', $xmailer);
     deliver($self, $context, $msg->as_string(), $mailbox, $id);
