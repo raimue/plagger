@@ -75,7 +75,7 @@ sub store_entry {
     }
     $msg = MIME::Lite->new(
         Date    => $date->format('Mail'),
-        From    => encode('MIME-Header', "X: " . $from_name . " <$from>") =~ s/X: //r,
+        From    => encode('MIME-Header', "X: " . $from_name) =~ s/X: //r . " <$from>",
         To      => $cfg->{mailto},
         Subject => encode('MIME-Header', "X: " . $subject) =~ s/X: //r,
         Type    => 'multipart/related',
